@@ -1,13 +1,21 @@
-import { TextDB } from "./textdb.ts";
+import { JsonDB } from "./jsondb.ts";
 
-const TEXTDB_ENDPOINT = Deno.env.get("TEXTDB_ENDPOINT");
-if (!TEXTDB_ENDPOINT) {
-  throw new Error("endpoint missing");
-}
+type Person = {
+  name: string;
+  age: number;
+};
 
-const db = new TextDB(TEXTDB_ENDPOINT);
-console.log(await db.get());
-await db.put("this is text db!");
-console.log(await db.get());
+// test page id
+const TEXTDB_ENDPOINT = "247213c6-8bb7-4576-a89f-e72584046c71";
+
+const db = new JsonDB<Person>(TEXTDB_ENDPOINT);
+console.log(await db.getAll());
+const alice = { name: "Alice", age: 12 };
+const bob = { name: "Bob", age: 10 };
+await db.putAll({ alice, bob });
+console.log(await db.getAll());
+console.log(await db.find("alice"));
+console.log(await db.find("bob"));
+console.log(await db.find("carol"));
 await db.clear();
-console.log(await db.get());
+console.log(await db.getAll());

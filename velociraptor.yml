@@ -12,10 +12,6 @@ scripts:
     desc: Runs main script
     cmd: main.ts
 
-  server:
-    desc: Starts local server
-    cmd: deployctl run --libs="" --watch --env=.env server.ts
-
   deps:
     desc: Update dependencies with ensuring pass tests
     cmd: udd deps.ts --test="vr test"

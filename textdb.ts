@@ -14,8 +14,9 @@ export class TextDB {
         },
       );
 
+      const text = await response.text();
       if (response.ok) {
-        return await response.text();
+        return text;
       }
 
       console.warn(response.statusText);
@@ -36,6 +37,9 @@ export class TextDB {
           body: data,
         },
       );
+
+      // ensure to close resource
+      await response.text();
 
       return response.ok;
     } catch (error) {

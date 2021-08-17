@@ -31,6 +31,11 @@ export class JsonDB<T> {
     return (await this.getAll())[id];
   }
 
+  async findMany(...ids: string[]): Promise<T[]> {
+    const all = await this.getAll();
+    return ids.map((id) => all[id]).filter((item) => item != null);
+  }
+
   async insert(data: T): Promise<string | null> {
     const id = crypto.randomUUID();
     const all = await this.getAll();
@@ -39,6 +44,20 @@ export class JsonDB<T> {
       return id;
     } else {
       return null;
+    }
+  }
+
+  async insertMany(...data: T[]): Promise<string[]> {
+    const all = await this.getAll();
+    const ids: string[] = data.map((item) => {
+      const id = crypto.randomUUID();
+      all[id] = item;
+      return id;
+    });
+    if (await this.putAll(all)) {
+      return ids;
+    } else {
+      return [];
     }
   }
 

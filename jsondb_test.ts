@@ -21,6 +21,7 @@ Deno.test("TextDB", async () => {
 
   const alice = { name: "Alice", age: 12 };
   const bob = { name: "Bob", age: 10 };
+  const carol = { name: "Carol", age: 13 };
 
   assert(await db.putAll({ alice, bob }));
 
@@ -34,4 +35,8 @@ Deno.test("TextDB", async () => {
   const idA = await db.insert(alice);
   assert(idA);
   assertEquals(await db.find(idA), alice);
+  const [idB, idC] = await db.insertMany(bob, carol);
+  assert(idB);
+  assert(idC);
+  assertEquals(await db.findMany(idB, idC), [bob, carol]);
 });

@@ -31,6 +31,17 @@ export class JsonDB<T> {
     return (await this.getAll())[id];
   }
 
+  async insert(data: T): Promise<string | null> {
+    const id = crypto.randomUUID();
+    const all = await this.getAll();
+    all[id] = data;
+    if (await this.putAll(all)) {
+      return id;
+    } else {
+      return null;
+    }
+  }
+
   async putAll(data: Record<string, T>): Promise<boolean> {
     try {
       const response = await fetch(

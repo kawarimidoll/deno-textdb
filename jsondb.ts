@@ -1,4 +1,5 @@
 import { assertObjectMatch } from "https://deno.land/std@0.104.0/testing/asserts.ts";
+import * as v4 from "https://deno.land/std@0.104.0/uuid/v4.ts";
 
 export type BaseSchema = {
   _id: string;
@@ -58,14 +59,21 @@ export class JsonDB<T extends Record<string | number | symbol, unknown>> {
     });
   }
 
-  async insert(data: T): Promise<string | undefined> {
+  async insert(data: T | T & BaseSchema): Promise<string | undefined> {
     return (await this.insertMany(data))[0];
   }
 
-  async insertMany(...data: T[]): Promise<string[]> {
+  async insertMany(...data: (T | T & BaseSchema)[]): Promise<string[]> {
     const all = await this.getAll();
     const ids: string[] = data.map((rawItem) => {
-      const id = crypto.randomUUID();
+      const id = typeof rawItem._id === "string" && !!rawItem._id
+        ? rawItem._id
+        : crypto.randomUUID();
+
+      if (!v4.validate(id)) {
+        throw new Error(`${id} is invalid id`);
+      }
+
       const item = { ...rawItem, _id: id };
       all[id] = item;
       return id;

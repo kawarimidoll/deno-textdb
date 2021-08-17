@@ -12,8 +12,10 @@ export class JsonDB<T> {
         { headers: { "content-type": "application/json" } },
       );
 
+      const json = await response.json();
+
       if (response.ok) {
-        return await response.json();
+        return json;
         // return JSON.parse(await response.text());
       }
 
@@ -39,6 +41,9 @@ export class JsonDB<T> {
           body: JSON.stringify(data),
         },
       );
+
+      // ensure to close resource
+      await response.text();
 
       return response.ok;
     } catch (error) {

@@ -1,72 +1,116 @@
-# deno-dev-template
+# deno-textdb
 
-[![ci](https://github.com/kawarimidoll/deno-dev-template/workflows/ci/badge.svg)](.github/workflows/ci.yml)
-[![deno.land](https://img.shields.io/badge/deno-%5E1.0.0-green?logo=deno)](https://deno.land)
+[![ci](https://github.com/kawarimidoll/deno-textdb/workflows/ci/badge.svg)](.github/workflows/ci.yml)
+[![deno.land](https://img.shields.io/badge/deno-%5E1.13.0-green?logo=deno)](https://deno.land)
 [![vr scripts](https://badges.velociraptor.run/flat.svg)](https://velociraptor.run)
 [![LICENSE](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 
-my deno template
+Use [textdb](https://textdb.dev)
+([bontaq/textdb](https://github.com/bontaq/textdb)) from Deno🦕
 
-Confirm there is `~/.deno/bin` in `$PATH` to use the scripts installed by
-`deno install`.
+## TextDB
 
-## Run with Velociraptor
-
-Need to install [Velociraptor](https://velociraptor.run/).
-
-```
-$ # install velociraptor
-$ deno install -qAn vr https://deno.land/x/velociraptor/cli.ts
-$ # install hook
-$ vr
-```
-
-The scripts are defined in [velociraptor.yml](/velociraptor.yml).
-
-### Run main.ts
-
-```
-$ vr start
-```
-
-### Start server.ts
-
-Need to install [deployctl](https://deno.com/deploy/docs/deployctl).
-
-```
-$ # install deployctl
-$ deno install --allow-read --allow-write --allow-env --allow-net --allow-run --no-check -f https://deno.land/x/deploy/deployctl.ts
-$ # start server
-$ vr dev
-```
-
-### Run tests
-
-Need to create `.env`.
-
-```
-$ # create .env
-$ cp .env.example .env
-$ # run tests
-$ vr test
-```
-
-### Run CI
-
-```
-$ # run lint, format, tests
-$ vr ci
-```
-
-## Logger
-
-Import from `logger.ts`.
+### Example
 
 ```ts
-import { Logger } from "./logger.ts";
+const db = new TextDB(TEXTDB_ENDPOINT);
 
-Logger.debug("This log is debug!");
-Logger.info("This log is info!");
-Logger.warning("This log is warning!");
-Logger.error("This log is error!");
+await db.clear();
+assertEquals(await db.get(), "");
+
+await db.put("this is text db!");
+assertEquals(await db.get(), "this is text db!");
+
+await db.put(`
+  this is multiline input!
+  this is multiline input!
+  this is multiline input!
+`.trim());
+assertEquals(
+  await db.get(),
+  `
+  this is multiline input!
+  this is multiline input!
+  this is multiline input!
+`.trim(),
+);
 ```
+
+### API
+
+#### new TextDB()
+
+Create a client.
+
+#### clear
+
+Clear contents.
+
+#### get
+
+Get contents.
+
+#### put
+
+Put contents.
+
+## JsonDB
+
+### Example
+
+```ts
+// model schema
+type Person = {
+  name: string;
+  age: number;
+};
+
+const db = new JsonDB<Person>(TEXTDB_ENDPOINT);
+
+await db.clear();
+assertEquals(await db.getAll(), {});
+
+const alice = { name: "Alice", age: 12 };
+const bob = { name: "Bob", age: 10 };
+const carol = { name: "Carol", age: 13 };
+
+const idA = await db.insert(alice);
+assert(idA);
+const findA = await db.find(idA);
+assert(findA);
+assertObjectMatch(findA, alice);
+const [idB, idC] = await db.insertMany(bob, carol);
+assert(idB);
+assert(idC);
+const [findB, findC] = await db.findMany(idB, idC);
+assert(findB);
+assert(findC);
+assertObjectMatch(findB, bob);
+assertObjectMatch(findC, carol);
+```
+
+### API
+
+#### new JsonDB<Schema>()
+
+Create a client.
+
+#### clear
+
+Clear contents.
+
+#### find
+
+Get contents by id.
+
+#### findMany
+
+Get contents by multiple id.
+
+#### insert
+
+Insert contents and return inserted id.
+
+#### insertMany
+
+Insert multiple contents and return inserted ids.

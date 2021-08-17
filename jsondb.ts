@@ -1,3 +1,7 @@
+export type BaseSchema = {
+  _id: string;
+};
+
 export class JsonDB<T> {
   public readonly endpoint: string;
 
@@ -5,7 +9,7 @@ export class JsonDB<T> {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
   }
 
-  async getAll(): Promise<Record<string, T>> {
+  async getAll(): Promise<Record<string, T & BaseSchema>> {
     try {
       const response = await fetch(
         this.endpoint,
@@ -27,11 +31,11 @@ export class JsonDB<T> {
     return {};
   }
 
-  async find(id: string): Promise<T | undefined> {
+  async find(id: string): Promise<T & BaseSchema | undefined> {
     return (await this.findMany(id))[0];
   }
 
-  async findMany(...ids: string[]): Promise<T[]> {
+  async findMany(...ids: string[]): Promise<(T & BaseSchema)[]> {
     const all = await this.getAll();
     return ids.map((id) => all[id]).filter((item) => item != null);
   }
@@ -42,19 +46,22 @@ export class JsonDB<T> {
 
   async insertMany(...data: T[]): Promise<string[]> {
     const all = await this.getAll();
-    const ids: string[] = data.map((item) => {
+    const ids: string[] = data.map((rawItem) => {
       const id = crypto.randomUUID();
+      const item = { ...rawItem, _id: id };
       all[id] = item;
       return id;
     });
-    if (await this.putAll(all)) {
+    if (await this._putAll(all)) {
       return ids;
     } else {
       return [];
     }
   }
 
-  async putAll(data: Record<string, T>): Promise<boolean> {
+  private async _putAll(
+    data: Record<string, T & BaseSchema>,
+  ): Promise<boolean> {
     try {
       const response = await fetch(
         this.endpoint,
@@ -77,6 +84,6 @@ export class JsonDB<T> {
   }
 
   async clear(): Promise<boolean> {
-    return await this.putAll({});
+    return await this._putAll({});
   }
 }

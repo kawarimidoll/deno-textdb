@@ -1,6 +1,7 @@
 import {
   assert,
   assertEquals,
+  assertObjectMatch,
 } from "https://deno.land/std@0.104.0/testing/asserts.ts";
 import { JsonDB } from "./jsondb.ts";
 
@@ -23,20 +24,17 @@ Deno.test("TextDB", async () => {
   const bob = { name: "Bob", age: 10 };
   const carol = { name: "Carol", age: 13 };
 
-  assert(await db.putAll({ alice, bob }));
-
-  assertEquals(await db.getAll(), { alice, bob });
-
-  assertEquals(await db.find("alice"), alice);
-  assertEquals(await db.find("bob"), bob);
-  assertEquals(await db.find("carol"), undefined);
-
-  await db.clear();
   const idA = await db.insert(alice);
   assert(idA);
-  assertEquals(await db.find(idA), alice);
+  const findA = await db.find(idA);
+  assert(findA);
+  assertObjectMatch(findA, alice);
   const [idB, idC] = await db.insertMany(bob, carol);
   assert(idB);
   assert(idC);
-  assertEquals(await db.findMany(idB, idC), [bob, carol]);
+  const [findB, findC] = await db.findMany(idB, idC);
+  assert(findB);
+  assert(findC);
+  assertObjectMatch(findB, bob);
+  assertObjectMatch(findC, carol);
 });

@@ -27,8 +27,8 @@ export class JsonDB<T> {
     return {};
   }
 
-  async find(id: string): Promise<T | null> {
-    return (await this.getAll())[id];
+  async find(id: string): Promise<T | undefined> {
+    return (await this.findMany(id))[0];
   }
 
   async findMany(...ids: string[]): Promise<T[]> {
@@ -36,15 +36,8 @@ export class JsonDB<T> {
     return ids.map((id) => all[id]).filter((item) => item != null);
   }
 
-  async insert(data: T): Promise<string | null> {
-    const id = crypto.randomUUID();
-    const all = await this.getAll();
-    all[id] = data;
-    if (await this.putAll(all)) {
-      return id;
-    } else {
-      return null;
-    }
+  async insert(data: T): Promise<string | undefined> {
+    return (await this.insertMany(data))[0];
   }
 
   async insertMany(...data: T[]): Promise<string[]> {

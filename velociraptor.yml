@@ -1,17 +1,4 @@
-allow:
-  # - write
-  # - read
-  - net
-  # - env
-
-# envFile:
-#   - .env
-
 scripts:
-  main:
-    desc: Runs main script
-    cmd: main.ts
-
   deps:
     desc: Update dependencies with ensuring pass tests
     cmd: udd deps.ts --test="vr test"
@@ -37,6 +24,8 @@ scripts:
   test:
     desc: Runs the tests
     cmd: deno test --reload
+    allow:
+      - net
     gitHook: pre-push
 
   cov:

@@ -1,8 +1,10 @@
+import { assertObjectMatch } from "https://deno.land/std@0.104.0/testing/asserts.ts";
+
 export type BaseSchema = {
   _id: string;
 };
 
-export class JsonDB<T> {
+export class JsonDB<T extends Record<string | number | symbol, unknown>> {
   public readonly endpoint: string;
 
   constructor(pageID: string) {
@@ -38,6 +40,22 @@ export class JsonDB<T> {
   async findMany(...ids: string[]): Promise<(T & BaseSchema)[]> {
     const all = await this.getAll();
     return ids.map((id) => all[id]).filter((item) => item != null);
+  }
+
+  private _objectMatch(outer: T & BaseSchema, inner: Partial<T>): boolean {
+    try {
+      assertObjectMatch(outer, inner);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async where(selector: Partial<T>) {
+    const all = await this.getAll();
+    return Object.values(all).filter((item) => {
+      return this._objectMatch(item, selector);
+    });
   }
 
   async insert(data: T): Promise<string | undefined> {

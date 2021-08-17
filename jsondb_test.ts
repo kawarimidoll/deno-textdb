@@ -1,5 +1,6 @@
 import {
   assert,
+  assertArrayIncludes,
   assertEquals,
   assertObjectMatch,
 } from "https://deno.land/std@0.104.0/testing/asserts.ts";
@@ -8,6 +9,7 @@ import { JsonDB } from "./jsondb.ts";
 type Person = {
   name: string;
   age: number;
+  gender: string;
 };
 
 // test page id
@@ -20,9 +22,9 @@ Deno.test("TextDB", async () => {
   await db.clear();
   assertEquals(await db.getAll(), {});
 
-  const alice = { name: "Alice", age: 12 };
-  const bob = { name: "Bob", age: 10 };
-  const carol = { name: "Carol", age: 13 };
+  const alice = { name: "Alice", age: 12, gender: "f" };
+  const bob = { name: "Bob", age: 10, gender: "m" };
+  const carol = { name: "Carol", age: 10, gender: "f" };
 
   const idA = await db.insert(alice);
   assert(idA);
@@ -37,4 +39,8 @@ Deno.test("TextDB", async () => {
   assert(findC);
   assertObjectMatch(findB, bob);
   assertObjectMatch(findC, carol);
+
+  // the iteration order is not guaranteed
+  assertArrayIncludes((await db.where({ age: 10 })), [findB, findC]);
+  assertArrayIncludes((await db.where({ age: 10, gender: "m" })), [findB]);
 });

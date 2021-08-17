@@ -84,6 +84,25 @@ export class JsonDB<T extends Record<string | number | symbol, unknown>> {
     }
   }
 
+  async delete(id: string): Promise<number> {
+    return await this.deleteMany(id);
+  }
+
+  async deleteMany(...ids: string[]): Promise<number> {
+    const all = await this.getAll();
+    const count = Object.keys(all).length;
+    ids.forEach((id) => {
+      delete all[id];
+    });
+
+    if (await this._putAll(all)) {
+      // return deleted count
+      return count - Object.keys(all).length;
+    } else {
+      return 0;
+    }
+  }
+
   private async _putAll(
     data: Record<string, T & BaseSchema>,
   ): Promise<boolean> {

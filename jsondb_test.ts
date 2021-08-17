@@ -43,4 +43,9 @@ Deno.test("TextDB", async () => {
   // the iteration order is not guaranteed
   assertArrayIncludes((await db.where({ age: 10 })), [findB, findC]);
   assertArrayIncludes((await db.where({ age: 10, gender: "m" })), [findB]);
+
+  assertEquals(await db.delete(idB), 1);
+  assertEquals(await db.find(idB), undefined);
+  assertEquals(await db.deleteMany(idA, idB, idC), 2);
+  assertEquals(await db.getAll(), {});
 });

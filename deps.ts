@@ -1,7 +1,7 @@
-import {
+export {
   assert,
+  assertArrayIncludes,
   assertEquals,
-  assertThrows,
-} from "https://deno.land/std@0.101.0/testing/asserts.ts";
-
-export { assert, assertEquals, assertThrows };
+  assertObjectMatch,
+} from "https://deno.land/std@0.105.0/testing/asserts.ts";
+export * as v4 from "https://deno.land/std@0.105.0/uuid/v4.ts";

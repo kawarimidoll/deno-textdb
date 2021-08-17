@@ -1,5 +1,4 @@
-import { assertObjectMatch } from "https://deno.land/std@0.104.0/testing/asserts.ts";
-import * as v4 from "https://deno.land/std@0.104.0/uuid/v4.ts";
+import { assertObjectMatch, v4 } from "./deps.ts";
 
 export type BaseSchema = {
   _id: string;

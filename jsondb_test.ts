@@ -3,7 +3,7 @@ import {
   assertArrayIncludes,
   assertEquals,
   assertObjectMatch,
-} from "https://deno.land/std@0.104.0/testing/asserts.ts";
+} from "./deps.ts";
 import { JsonDB } from "./jsondb.ts";
 
 type Person = {

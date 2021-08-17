@@ -1,7 +1,4 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.104.0/testing/asserts.ts";
+import { assert, assertEquals } from "./deps.ts";
 import { TextDB } from "./textdb.ts";
 
 // test page id

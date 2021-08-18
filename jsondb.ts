@@ -1,6 +1,6 @@
 import { assertObjectMatch, validateUUID } from "./deps.ts";
 
-export type BaseSchema = {
+export type JsonDBSchema<T> = T & {
   _id: string;
 };
 
@@ -11,7 +11,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
   }
 
-  async getAll(): Promise<Record<string, T & BaseSchema>> {
+  async getAll(): Promise<Record<string, JsonDBSchema<T>>> {
     try {
       const response = await fetch(
         this.endpoint,
@@ -33,16 +33,16 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     return {};
   }
 
-  async find(id: string): Promise<T & BaseSchema | undefined> {
+  async find(id: string): Promise<JsonDBSchema<T> | undefined> {
     return (await this.findMany(id))[0];
   }
 
-  async findMany(...ids: string[]): Promise<(T & BaseSchema)[]> {
+  async findMany(...ids: string[]): Promise<JsonDBSchema<T>[]> {
     const all = await this.getAll();
     return ids.map((id) => all[id]).filter((item) => item != null);
   }
 
-  private _objectMatch(outer: T & BaseSchema, inner: Partial<T>): boolean {
+  private _objectMatch(outer: JsonDBSchema<T>, inner: Partial<T>): boolean {
     try {
       assertObjectMatch(outer, inner);
       return true;
@@ -51,18 +51,18 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     }
   }
 
-  async where(selector: Partial<T>) {
+  async where(selector: Partial<T>): Promise<JsonDBSchema<T>[]> {
     const all = await this.getAll();
     return Object.values(all).filter((item) => {
       return this._objectMatch(item, selector);
     });
   }
 
-  async insert(data: T | T & BaseSchema): Promise<string | undefined> {
+  async insert(data: T | JsonDBSchema<T>): Promise<string | undefined> {
     return (await this.insertMany(data))[0];
   }
 
-  async insertMany(...data: (T | T & BaseSchema)[]): Promise<string[]> {
+  async insertMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
     const all = await this.getAll();
     const ids: string[] = data.map((rawItem) => {
       const _id = typeof rawItem._id === "string" && !!rawItem._id
@@ -104,7 +104,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   private async _putAll(
-    data: Record<string, T & BaseSchema>,
+    data: Record<string, JsonDBSchema<T>>,
   ): Promise<boolean> {
     try {
       const response = await fetch(

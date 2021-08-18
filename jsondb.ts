@@ -85,11 +85,11 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     });
   }
 
-  async insert(data: T | JsonDBSchema<T>): Promise<string | undefined> {
-    return (await this.insertMany(data))[0];
+  async save(data: T | JsonDBSchema<T>): Promise<string | undefined> {
+    return (await this.saveMany(data))[0];
   }
 
-  async insertMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
+  async saveMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
     const rawDB = await this._getRawDB();
     const ids: string[] = data.map((rawItem) => {
       const _id = typeof rawItem._id === "string" && !!rawItem._id

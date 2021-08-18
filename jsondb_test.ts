@@ -27,13 +27,13 @@ Deno.test("JsonDB", async () => {
   const bob: Person = { name: "Bob", age: 10, gender: "m" };
   const carol: Person = { name: "Carol", age: 10, gender: "f" };
 
-  const idA = await db.insert(alice);
+  const idA = await db.save(alice);
   assert(idA);
   const findA = await db.find(idA);
   assert(findA);
   assertObjectMatch(findA, alice);
 
-  const [idB, idC] = await db.insertMany(bob, carol);
+  const [idB, idC] = await db.saveMany(bob, carol);
   assert(idB);
   assert(idC);
   const [findB, findC] = await db.findMany(idB, idC);
@@ -44,7 +44,7 @@ Deno.test("JsonDB", async () => {
 
   assertThrowsAsync(
     async () => {
-      await db.insert({ _id: "dummy", name: "Dave", age: 10, gender: "f" });
+      await db.save({ _id: "dummy", name: "Dave", age: 10, gender: "m" });
     },
     Error,
     "dummy is invalid UUID",

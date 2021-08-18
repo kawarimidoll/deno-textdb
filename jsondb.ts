@@ -1,10 +1,10 @@
-import { assertObjectMatch, v4 } from "./deps.ts";
+import { assertObjectMatch, validateUUID } from "./deps.ts";
 
 export type BaseSchema = {
   _id: string;
 };
 
-export class JsonDB<T extends Record<string | number | symbol, unknown>> {
+export class JsonDB<T extends Record<PropertyKey, unknown>> {
   public readonly endpoint: string;
 
   constructor(pageID: string) {
@@ -65,17 +65,17 @@ export class JsonDB<T extends Record<string | number | symbol, unknown>> {
   async insertMany(...data: (T | T & BaseSchema)[]): Promise<string[]> {
     const all = await this.getAll();
     const ids: string[] = data.map((rawItem) => {
-      const id = typeof rawItem._id === "string" && !!rawItem._id
+      const _id = typeof rawItem._id === "string" && !!rawItem._id
         ? rawItem._id
         : crypto.randomUUID();
 
-      if (!v4.validate(id)) {
-        throw new Error(`${id} is invalid id`);
+      if (!validateUUID(_id)) {
+        throw new Error(`${_id} is invalid UUID`);
       }
 
-      const item = { ...rawItem, _id: id };
-      all[id] = item;
-      return id;
+      const item = { ...rawItem, _id };
+      all[_id] = item;
+      return _id;
     });
     if (await this._putAll(all)) {
       return ids;

@@ -15,7 +15,7 @@ type Person = {
 // test page id
 const TEXTDB_ENDPOINT = "247213c6-8bb7-4576-a89f-e72584046c71";
 
-Deno.test("TextDB", async () => {
+Deno.test("JsonDB", async () => {
   const db = new JsonDB<Person>(TEXTDB_ENDPOINT);
   assert(db);
 

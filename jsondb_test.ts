@@ -3,13 +3,14 @@ import {
   assertArrayIncludes,
   assertEquals,
   assertObjectMatch,
+  assertThrowsAsync,
 } from "./deps.ts";
 import { JsonDB } from "./jsondb.ts";
 
 type Person = {
   name: string;
   age: number;
-  gender: string;
+  gender: "m" | "f";
 };
 
 // test page id
@@ -22,15 +23,16 @@ Deno.test("JsonDB", async () => {
   await db.clear();
   assertEquals(await db.getAll(), {});
 
-  const alice = { name: "Alice", age: 12, gender: "f" };
-  const bob = { name: "Bob", age: 10, gender: "m" };
-  const carol = { name: "Carol", age: 10, gender: "f" };
+  const alice: Person = { name: "Alice", age: 12, gender: "f" };
+  const bob: Person = { name: "Bob", age: 10, gender: "m" };
+  const carol: Person = { name: "Carol", age: 10, gender: "f" };
 
   const idA = await db.insert(alice);
   assert(idA);
   const findA = await db.find(idA);
   assert(findA);
   assertObjectMatch(findA, alice);
+
   const [idB, idC] = await db.insertMany(bob, carol);
   assert(idB);
   assert(idC);
@@ -39,6 +41,14 @@ Deno.test("JsonDB", async () => {
   assert(findC);
   assertObjectMatch(findB, bob);
   assertObjectMatch(findC, carol);
+
+  assertThrowsAsync(
+    async () => {
+      await db.insert({ _id: "dummy", name: "Dave", age: 10, gender: "f" });
+    },
+    Error,
+    "dummy is invalid UUID",
+  );
 
   // the iteration order is not guaranteed
   assertArrayIncludes((await db.where({ age: 10 })), [findB, findC]);

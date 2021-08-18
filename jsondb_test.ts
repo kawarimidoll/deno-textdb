@@ -21,7 +21,7 @@ Deno.test("JsonDB", async () => {
   assert(db);
 
   await db.clear();
-  assertEquals(await db.getAll(), {});
+  assertEquals(await db.all(), []);
 
   const alice: Person = { name: "Alice", age: 12, gender: "f" };
   const bob: Person = { name: "Bob", age: 10, gender: "m" };
@@ -57,5 +57,5 @@ Deno.test("JsonDB", async () => {
   assertEquals(await db.delete(idB), 1);
   assertEquals(await db.find(idB), undefined);
   assertEquals(await db.deleteMany(idA, idB, idC), 2);
-  assertEquals(await db.getAll(), {});
+  assertEquals(await db.all(), []);
 });

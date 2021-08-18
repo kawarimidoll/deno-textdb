@@ -11,7 +11,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
   }
 
-  async getAll(): Promise<Record<string, JsonDBSchema<T>>> {
+  private async _getRawDB(): Promise<Record<string, JsonDBSchema<T>>> {
     try {
       const response = await fetch(
         this.endpoint,
@@ -22,7 +22,6 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
       if (response.ok) {
         return json;
-        // return JSON.parse(await response.text());
       }
 
       console.warn(response.statusText);
@@ -33,77 +32,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     return {};
   }
 
-  async find(id: string): Promise<JsonDBSchema<T> | undefined> {
-    return (await this.findMany(id))[0];
-  }
-
-  async findMany(...ids: string[]): Promise<JsonDBSchema<T>[]> {
-    const all = await this.getAll();
-    return ids.map((id) => all[id]).filter((item) => item != null);
-  }
-
-  private _objectMatch(outer: JsonDBSchema<T>, inner: Partial<T>): boolean {
-    try {
-      assertObjectMatch(outer, inner);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async where(selector: Partial<T>): Promise<JsonDBSchema<T>[]> {
-    const all = await this.getAll();
-    return Object.values(all).filter((item) => {
-      return this._objectMatch(item, selector);
-    });
-  }
-
-  async insert(data: T | JsonDBSchema<T>): Promise<string | undefined> {
-    return (await this.insertMany(data))[0];
-  }
-
-  async insertMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
-    const all = await this.getAll();
-    const ids: string[] = data.map((rawItem) => {
-      const _id = typeof rawItem._id === "string" && !!rawItem._id
-        ? rawItem._id
-        : crypto.randomUUID();
-
-      if (!validateUUID(_id)) {
-        throw new Error(`${_id} is invalid UUID`);
-      }
-
-      const item = { ...rawItem, _id };
-      all[_id] = item;
-      return _id;
-    });
-    if (await this._putAll(all)) {
-      return ids;
-    } else {
-      return [];
-    }
-  }
-
-  async delete(id: string): Promise<number> {
-    return await this.deleteMany(id);
-  }
-
-  async deleteMany(...ids: string[]): Promise<number> {
-    const all = await this.getAll();
-    const count = Object.keys(all).length;
-    ids.forEach((id) => {
-      delete all[id];
-    });
-
-    if (await this._putAll(all)) {
-      // return deleted count
-      return count - Object.keys(all).length;
-    } else {
-      return 0;
-    }
-  }
-
-  private async _putAll(
+  private async _putRawDB(
     data: Record<string, JsonDBSchema<T>>,
   ): Promise<boolean> {
     try {
@@ -127,7 +56,81 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     return false;
   }
 
+  async all(): Promise<JsonDBSchema<T>[]> {
+    return Object.values(await this._getRawDB());
+  }
+
+  async find(id: string): Promise<JsonDBSchema<T> | undefined> {
+    return (await this.findMany(id))[0];
+  }
+
+  async findMany(...ids: string[]): Promise<JsonDBSchema<T>[]> {
+    const rawDB = await this._getRawDB();
+    return ids.map((id) => rawDB[id]).filter((item) => item != null);
+  }
+
+  private _objectMatch(outer: JsonDBSchema<T>, inner: Partial<T>): boolean {
+    try {
+      assertObjectMatch(outer, inner);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async where(selector: Partial<T>): Promise<JsonDBSchema<T>[]> {
+    const rawDB = await this._getRawDB();
+    return Object.values(rawDB).filter((item) => {
+      return this._objectMatch(item, selector);
+    });
+  }
+
+  async insert(data: T | JsonDBSchema<T>): Promise<string | undefined> {
+    return (await this.insertMany(data))[0];
+  }
+
+  async insertMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
+    const rawDB = await this._getRawDB();
+    const ids: string[] = data.map((rawItem) => {
+      const _id = typeof rawItem._id === "string" && !!rawItem._id
+        ? rawItem._id
+        : crypto.randomUUID();
+
+      if (!validateUUID(_id)) {
+        throw new Error(`${_id} is invalid UUID`);
+      }
+
+      const item = { ...rawItem, _id };
+      rawDB[_id] = item;
+      return _id;
+    });
+    if (await this._putRawDB(rawDB)) {
+      return ids;
+    } else {
+      return [];
+    }
+  }
+
+  async delete(id: string): Promise<number> {
+    return await this.deleteMany(id);
+  }
+
+  async deleteMany(...ids: string[]): Promise<number> {
+    const rawDB = await this._getRawDB();
+    const count = Object.keys(rawDB).length;
+    ids.forEach((id) => {
+      delete rawDB[id];
+    });
+
+    if (await this._putRawDB(rawDB)) {
+      // return deleted count
+      return count - Object.keys(rawDB).length;
+    } else {
+      return 0;
+    }
+  }
+
   async clear(): Promise<boolean> {
-    return await this._putAll({});
+    return await this._putRawDB({});
   }
 }

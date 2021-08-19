@@ -3,7 +3,7 @@ import {
   assertArrayIncludes,
   assertEquals,
   assertObjectMatch,
-  assertThrowsAsync,
+  assertRejects,
 } from "./deps.ts";
 import { JsonDB } from "./jsondb.ts";
 
@@ -42,7 +42,7 @@ Deno.test("JsonDB", async () => {
   assertObjectMatch(findB, bob);
   assertObjectMatch(findC, carol);
 
-  assertThrowsAsync(
+  assertRejects(
     async () => {
       await db.save({ _id: "dummy", name: "Dave", age: 10, gender: "m" });
     },

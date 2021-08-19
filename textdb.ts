@@ -5,7 +5,7 @@ export class TextDB {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
   }
 
-  async get(): Promise<string | null> {
+  async get(): Promise<string | undefined> {
     try {
       const response = await fetch(
         this.endpoint,
@@ -24,7 +24,7 @@ export class TextDB {
       console.warn(error);
     }
 
-    return null;
+    return undefined;
   }
 
   async put(data: string): Promise<boolean> {

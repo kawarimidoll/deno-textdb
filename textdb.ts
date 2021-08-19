@@ -1,10 +1,25 @@
+/**
+ * TextDB class
+ */
 export class TextDB {
+  /**
+   * DB api endpoint
+   */
   public readonly endpoint: string;
 
+  /**
+   * TextDB constructor
+   * @param {string} pageID
+   */
   constructor(pageID: string) {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
   }
 
+  /**
+   * get data from TextDB
+   * it returns undefined when the connection failed
+   * @returns got data
+   */
   async get(): Promise<string | undefined> {
     try {
       const response = await fetch(
@@ -27,6 +42,10 @@ export class TextDB {
     return undefined;
   }
 
+  /**
+   * put data into TextDB
+   * @returns succeeded or not
+   */
   async put(data: string): Promise<boolean> {
     try {
       const response = await fetch(
@@ -49,6 +68,10 @@ export class TextDB {
     return false;
   }
 
+  /**
+   * clear TextDB
+   * @returns succeeded or not
+   */
   async clear(): Promise<boolean> {
     return await this.put("");
   }

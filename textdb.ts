@@ -22,14 +22,9 @@ export class TextDB {
    */
   async get(): Promise<string | undefined> {
     try {
-      const response = await fetch(
-        this.endpoint,
-        {
-          headers: { "content-type": "text/plain" },
-        },
-      );
-
+      const response = await fetch(this.endpoint);
       const text = await response.text();
+
       if (response.ok) {
         return text;
       }

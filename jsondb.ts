@@ -32,11 +32,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
    */
   private async _getRawDB(): Promise<Record<string, JsonDBSchema<T>>> {
     try {
-      const response = await fetch(
-        this.endpoint,
-        { headers: { "content-type": "application/json" } },
-      );
-
+      const response = await fetch(this.endpoint);
       const json = await response.json();
 
       if (response.ok) {

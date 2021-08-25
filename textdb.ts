@@ -1,5 +1,6 @@
 /**
- * TextDB class
+ * TextDB class.
+ * Put and get text data using TextDB.
  */
 export class TextDB {
   /**
@@ -9,7 +10,7 @@ export class TextDB {
 
   /**
    * TextDB constructor
-   * @param {string} pageID
+   * @param  pageID
    */
   constructor(pageID: string) {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
@@ -18,7 +19,7 @@ export class TextDB {
   /**
    * get data from TextDB
    * it returns undefined when the connection failed
-   * @returns got data
+   * @return got data
    */
   async get(): Promise<string | undefined> {
     try {
@@ -40,7 +41,7 @@ export class TextDB {
   /**
    * put data into TextDB
    * the saved data is replaced, not appended
-   * @returns succeeded or not
+   * @return succeeded or not
    */
   async put(data: string): Promise<boolean> {
     try {
@@ -66,7 +67,7 @@ export class TextDB {
 
   /**
    * clear saved data
-   * @returns succeeded or not
+   * @return succeeded or not
    */
   async clear(): Promise<boolean> {
     return await this.put("");

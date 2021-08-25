@@ -10,7 +10,8 @@ export type JsonDBSchema<T> = T & {
 };
 
 /**
- * JsonDB class
+ * JsonDB class.
+ * Use TextDB like KVS.
  */
 export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
@@ -20,7 +21,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * JsonDB constructor
-   * @param {string} pageID
+   * @param pageID
    */
   constructor(pageID: string) {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
@@ -29,7 +30,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * get raw data from TextDB
    * @private
-   * @returns got data
+   * @return got data
    */
   private async _getRawDB(): Promise<Record<string, JsonDBSchema<T>>> {
     try {
@@ -51,7 +52,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * put raw data to TextDB
    * @private
-   * @returns succeeded or not
+   * @return succeeded or not
    */
   private async _putRawDB(
     data: Record<string, JsonDBSchema<T>>,
@@ -79,7 +80,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * get all data
-   * @returns got data
+   * @return got data
    */
   async all(): Promise<JsonDBSchema<T>[]> {
     return Object.values(await this._getRawDB());
@@ -88,7 +89,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * get single data by id
    * @param id to find
-   * @returns got data
+   * @return got data
    */
   async find(id: string): Promise<JsonDBSchema<T> | undefined> {
     return (await this.findMany(id))[0];
@@ -97,7 +98,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * get multiple data by ids
    * @param array of id to find
-   * @returns got data
+   * @return got data
    */
   async findMany(...ids: string[]): Promise<JsonDBSchema<T>[]> {
     const rawDB = await this._getRawDB();
@@ -107,7 +108,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * assert objects are matched, but returns boolean, not throw exception
    * @private
-   * @returns matched or not
+   * @return matched or not
    */
   private _objectMatch(outer: JsonDBSchema<T>, inner: Partial<T>): boolean {
     try {
@@ -120,7 +121,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * get multiple data by given key and values
-   * @returns got data
+   * @return got data
    */
   async where(selector: Partial<T>): Promise<JsonDBSchema<T>[]> {
     const rawDB = await this._getRawDB();
@@ -132,7 +133,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * save single data
    * @param data to save
-   * @returns saved id
+   * @return saved id
    */
   async save(data: T | JsonDBSchema<T>): Promise<string | undefined> {
     return (await this.saveMany(data))[0];
@@ -141,7 +142,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * save multiline data
    * @param array of data to save
-   * @returns saved ids
+   * @return saved ids
    */
   async saveMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
     const rawDB = await this._getRawDB();
@@ -168,7 +169,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * save multiline data
    * @param id to delete
-   * @returns deleted count
+   * @return deleted count
    */
   async delete(id: string): Promise<number> {
     return await this.deleteMany(id);
@@ -177,7 +178,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * delete multiline data by id
    * @param array of id to delete
-   * @returns deleted count
+   * @return deleted count
    */
   async deleteMany(...ids: string[]): Promise<number> {
     const rawDB = await this._getRawDB();
@@ -196,7 +197,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * clear saved data
-   * @returns succeeded or not
+   * @return succeeded or not
    */
   async clear(): Promise<boolean> {
     return await this._putRawDB({});

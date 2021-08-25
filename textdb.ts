@@ -39,6 +39,7 @@ export class TextDB {
 
   /**
    * put data into TextDB
+   * the saved data is replaced, not appended
    * @returns succeeded or not
    */
   async put(data: string): Promise<boolean> {
@@ -64,7 +65,7 @@ export class TextDB {
   }
 
   /**
-   * clear TextDB
+   * clear saved data
    * @returns succeeded or not
    */
   async clear(): Promise<boolean> {

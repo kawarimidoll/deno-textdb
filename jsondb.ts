@@ -3,6 +3,7 @@ import { assertObjectMatch, validateUUID } from "./deps.ts";
 /**
  * JsonDB Schema
  * add _id property to the record user passed
+ * _id is UUID v4
  */
 export type JsonDBSchema<T> = T & {
   _id: string;
@@ -131,7 +132,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * save single data
    * @param data to save
-   * @returns succeeded or not
+   * @returns saved id
    */
   async save(data: T | JsonDBSchema<T>): Promise<string | undefined> {
     return (await this.saveMany(data))[0];
@@ -140,7 +141,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   /**
    * save multiline data
    * @param array of data to save
-   * @returns succeeded or not
+   * @returns saved ids
    */
   async saveMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
     const rawDB = await this._getRawDB();
@@ -166,7 +167,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * save multiline data
-   * @param data to delete
+   * @param id to delete
    * @returns deleted count
    */
   async delete(id: string): Promise<number> {
@@ -175,7 +176,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
 
   /**
    * delete multiline data by id
-   * @param array of data to delete
+   * @param array of id to delete
    * @returns deleted count
    */
   async deleteMany(...ids: string[]): Promise<number> {
@@ -194,7 +195,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   /**
-   * clear DB data
+   * clear saved data
    * @returns succeeded or not
    */
   async clear(): Promise<boolean> {

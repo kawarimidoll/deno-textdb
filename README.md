@@ -18,7 +18,7 @@ For API information, see:
 
 Put and get text data using TextDB.
 
-#### Example
+#### Examples
 
 ```ts
 import { TextDB } from "https://deno.land/x/textdb/mod.ts";
@@ -49,7 +49,7 @@ assertEquals(
 
 Use TextDB like KVS.
 
-#### Example
+#### Examples
 
 ```ts
 import { JsonDB } from "https://deno.land/x/textdb/mod.ts";

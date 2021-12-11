@@ -4,5 +4,5 @@ export {
   assertEquals,
   assertObjectMatch,
   assertRejects,
-} from "https://deno.land/std@0.113.0/testing/asserts.ts";
-export { validate as validateUUID } from "https://deno.land/std@0.113.0/uuid/v4.ts";
+} from "https://deno.land/std@0.117.0/testing/asserts.ts";
+export { validate as validateUUID } from "https://deno.land/std@0.117.0/uuid/v4.ts";

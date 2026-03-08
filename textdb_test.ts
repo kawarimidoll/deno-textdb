@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "./deps.ts";
+import { assert, assertEquals } from "@std/assert";
 import { TextDB } from "./textdb.ts";
 
 // test page id

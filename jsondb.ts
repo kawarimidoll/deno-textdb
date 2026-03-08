@@ -1,4 +1,4 @@
-import { assertObjectMatch, validateUUID } from "./deps.ts";
+import { validate as validateUUID } from "@std/uuid/v4";
 
 /**
  * JsonDB Schema
@@ -106,17 +106,14 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   /**
-   * assert objects are matched, but returns boolean, not throw exception
+   * check if outer object contains all key-value pairs of inner object
    * @private
    * @return matched or not
    */
   private _objectMatch(outer: JsonDBSchema<T>, inner: Partial<T>): boolean {
-    try {
-      assertObjectMatch(outer, inner);
-      return true;
-    } catch {
-      return false;
-    }
+    return Object.entries(inner).every(
+      ([key, value]) => outer[key as keyof JsonDBSchema<T>] === value,
+    );
   }
 
   /**

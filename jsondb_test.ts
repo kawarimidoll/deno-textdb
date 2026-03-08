@@ -4,7 +4,7 @@ import {
   assertEquals,
   assertObjectMatch,
   assertRejects,
-} from "./deps.ts";
+} from "@std/assert";
 import { JsonDB } from "./jsondb.ts";
 
 type Person = {

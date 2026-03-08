@@ -1,27 +1,35 @@
 import { validate as validateUUID } from "@std/uuid/v4";
 
 /**
- * JsonDB Schema
- * add _id property to the record user passed
- * _id is UUID v4
+ * A record stored in JsonDB, extending user-defined type `T` with an
+ * auto-generated `_id` field (UUID v4).
  */
 export type JsonDBSchema<T> = T & {
   _id: string;
 };
 
 /**
- * JsonDB class.
- * Use TextDB like KVS.
+ * A JSON-based key-value store built on top of textdb.dev.
+ * Supports CRUD operations with auto-generated UUID keys.
+ *
+ * @example
+ * ```ts
+ * import { JsonDB } from "@kawarimidoll/textdb";
+ *
+ * type User = { name: string; age: number };
+ * const db = new JsonDB<User>("your-page-id");
+ *
+ * const id = await db.save({ name: "Alice", age: 20 });
+ * const users = await db.where({ age: 20 });
+ * console.log(users); // [{ _id: "...", name: "Alice", age: 20 }]
+ * ```
  */
 export class JsonDB<T extends Record<PropertyKey, unknown>> {
-  /**
-   * DB api endpoint
-   */
+  /** The textdb.dev API endpoint URL. */
   public readonly endpoint: string;
 
-  /**
-   * JsonDB constructor
-   * @param pageID
+  /** Creates a new JsonDB instance.
+   * @param pageID The page ID for your textdb.dev storage.
    */
   constructor(pageID: string) {
     this.endpoint = `https://textdb.dev/api/data/${pageID}`;
@@ -78,27 +86,22 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     return false;
   }
 
-  /**
-   * get all data
-   * @return got data
-   */
+  /** Returns all stored records. */
   async all(): Promise<JsonDBSchema<T>[]> {
     return Object.values(await this._getRawDB());
   }
 
   /**
-   * get single data by id
-   * @param id to find
-   * @return got data
+   * Finds a single record by its ID.
+   * @param id The UUID of the record to find.
    */
   async find(id: string): Promise<JsonDBSchema<T> | undefined> {
     return (await this.findMany(id))[0];
   }
 
   /**
-   * get multiple data by ids
-   * @param array of id to find
-   * @return got data
+   * Finds multiple records by their IDs.
+   * @param ids The UUIDs of the records to find.
    */
   async findMany(...ids: string[]): Promise<JsonDBSchema<T>[]> {
     const rawDB = await this._getRawDB();
@@ -117,8 +120,8 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   /**
-   * get multiple data by given key and values
-   * @return got data
+   * Finds records matching the given key-value pairs.
+   * @param selector An object with fields to match against.
    */
   async where(selector: Partial<T>): Promise<JsonDBSchema<T>[]> {
     const rawDB = await this._getRawDB();
@@ -128,18 +131,16 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   /**
-   * save single data
-   * @param data to save
-   * @return saved id
+   * Saves a single record. Returns its UUID, or `undefined` on failure.
+   * @param data The record to save.
    */
   async save(data: T | JsonDBSchema<T>): Promise<string | undefined> {
     return (await this.saveMany(data))[0];
   }
 
   /**
-   * save multiline data
-   * @param array of data to save
-   * @return saved ids
+   * Saves multiple records. Returns their UUIDs, or an empty array on failure.
+   * @param data The records to save.
    */
   async saveMany(...data: (T | JsonDBSchema<T>)[]): Promise<string[]> {
     const rawDB = await this._getRawDB();
@@ -164,18 +165,18 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
   }
 
   /**
-   * save multiline data
-   * @param id to delete
-   * @return deleted count
+   * Deletes a single record by its ID.
+   * @param id The UUID of the record to delete.
+   * @returns The number of records deleted (0 or 1).
    */
   async delete(id: string): Promise<number> {
     return await this.deleteMany(id);
   }
 
   /**
-   * delete multiline data by id
-   * @param array of id to delete
-   * @return deleted count
+   * Deletes multiple records by their IDs.
+   * @param ids The UUIDs of the records to delete.
+   * @returns The number of records actually deleted.
    */
   async deleteMany(...ids: string[]): Promise<number> {
     const rawDB = await this._getRawDB();
@@ -192,10 +193,7 @@ export class JsonDB<T extends Record<PropertyKey, unknown>> {
     }
   }
 
-  /**
-   * clear saved data
-   * @return succeeded or not
-   */
+  /** Clears all stored records. */
   async clear(): Promise<boolean> {
     return await this._putRawDB({});
   }

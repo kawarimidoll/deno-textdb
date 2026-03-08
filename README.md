@@ -1,9 +1,7 @@
 # deno-textdb
 
 [![ci](https://github.com/kawarimidoll/deno-textdb/workflows/ci/badge.svg)](.github/workflows/ci.yml)
-[![deno version](https://img.shields.io/badge/deno-%5E1.13.0-green?logo=deno)](https://deno.land)
-[![vr scripts](https://badges.velociraptor.run/flat.svg)](https://velociraptor.run)
-[![deno.land](https://img.shields.io/github/v/tag/kawarimidoll/deno-textdb?style=flat&logo=deno&label=deno.land&color=steelblue&sort=semver)](https://deno.land/x/textdb)
+[![JSR](https://jsr.io/badges/@kawarimidoll/textdb)](https://jsr.io/@kawarimidoll/textdb)
 [![LICENSE](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 
 Use [textdb.dev](https://textdb.dev)
@@ -11,8 +9,8 @@ Use [textdb.dev](https://textdb.dev)
 
 ## Usage
 
-For API information, see:
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/textdb/mod.ts)
+For API information, see
+[jsr.io/@kawarimidoll/textdb](https://jsr.io/@kawarimidoll/textdb).
 
 ### TextDB
 
@@ -21,7 +19,7 @@ Put and get text data using TextDB.
 #### Examples
 
 ```ts
-import { TextDB } from "https://deno.land/x/textdb/mod.ts";
+import { TextDB } from "jsr:@kawarimidoll/textdb";
 const db = new TextDB(TEXTDB_ENDPOINT);
 
 await db.clear();
@@ -52,7 +50,7 @@ Use TextDB like KVS.
 #### Examples
 
 ```ts
-import { JsonDB } from "https://deno.land/x/textdb/mod.ts";
+import { JsonDB } from "jsr:@kawarimidoll/textdb";
 
 // model schema
 type Person = {

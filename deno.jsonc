@@ -14,8 +14,8 @@
   },
   "exclude": ["cov_profile", "z-ai"],
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1",
-    "@std/uuid": "jsr:@std/uuid@^1"
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/uuid": "jsr:@std/uuid@^1.1.0"
   },
   "tasks": {
     "test": "deno test --allow-net",
